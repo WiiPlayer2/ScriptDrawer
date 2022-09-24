@@ -3,6 +3,8 @@ using System.Linq;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ScriptDrawer.Core;
+using YamlDotNet.Serialization;
 
 namespace ScriptDrawer.Demo;
 
@@ -27,6 +29,9 @@ public partial class App
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainViewModel>();
         services.Configure<Config>(ctx.Configuration);
+        services.AddSingleton(sp => new SerializerBuilder().Build());
+        services.AddSingleton(sp => new DeserializerBuilder().Build());
+        services.AddSingleton<Engine>();
     }
 
     #region Startup & Exit

@@ -7,16 +7,13 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using DynamicData.Kernel;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
 using ScriptDrawer.Core;
 using ScriptDrawer.Shared;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
-using Path = System.IO.Path;
+using YamlDotNet.Serialization;
 
 namespace ScriptDrawer.Demo;
 
@@ -24,16 +21,33 @@ internal class MainViewModel
 {
     private readonly Subject<Config> configSubject = new();
 
-    public MainViewModel(IOptionsMonitor<Config> configMonitor, ILogger<MainViewModel> logger)
+    public MainViewModel(
+        IOptionsMonitor<Config> configMonitor,
+        ILogger<MainViewModel> logger,
+        IDeserializer deserializer,
+        Engine engine)
     {
         var publisher = new DelegatePublisher((name, image) => PublishedImages.Add(new PublishedImage(name, image)));
 
-        configSubject.Select(config => config.Pipeline)
-            .CompilePipeline(logger)
-            .ObserveOnDispatcher()
-            .SelectAsync(async (pipeline, cancellationToken) =>
+        var pipelines = configSubject
+            .Select(config => config.Pipeline)
+            .CompilePipeline(logger, engine);
+
+        var configurationContent = configSubject
+            .Select(config => config.Configuration)
+            .ReadConfigurationContent(logger, deserializer);
+
+        pipelines.CombineLatest(configurationContent, (pipeline, configurationContent) =>
             {
-                await ExecutePipelineAsync(pipeline, logger, publisher, cancellationToken);
+                var configuration = deserializer.Deserialize(configurationContent, pipeline.ConfigurationType);
+                return (pipeline, configuration);
+            })
+            .RetryWithDefaultBackOff()
+            .ObserveOnDispatcher()
+            .SelectAsync(async (pair, cancellationToken) =>
+            {
+                var (pipeline, configuration) = pair;
+                await ExecutePipelineAsync(pipeline, logger, publisher, configuration, cancellationToken);
                 return Unit.Default;
             })
             .Subscribe();
@@ -44,12 +58,12 @@ internal class MainViewModel
 
     public ObservableCollection<PublishedImage> PublishedImages { get; } = new();
 
-    private async Task ExecutePipelineAsync(IPipeline pipeline, ILogger logger, IPublisher publisher, CancellationToken cancellationToken)
+    private async Task ExecutePipelineAsync(IPipeline pipeline, ILogger logger, IPublisher publisher, object? configuration, CancellationToken cancellationToken)
     {
         PublishedImages.Clear();
         try
         {
-            await pipeline.ExecuteAsync(publisher, cancellationToken);
+            await pipeline.ExecuteAsync(publisher, configuration, cancellationToken);
         }
         catch (Exception e)
         {
@@ -60,19 +74,12 @@ internal class MainViewModel
 
 internal static class RenderExtensions
 {
-    private static IObservable<IPipeline> Compile(this IObservable<string> code, ILogger logger)
+    private static IObservable<IPipeline> Compile(this IObservable<string> code, ILogger logger, Engine engine)
         => code.SelectAsync(async (code, cancellationToken) =>
             {
                 try
                 {
-                    var scriptOptions = ScriptOptions.Default
-                        .WithReferences(
-                            typeof(IPipeline).Assembly,
-                            typeof(Image).Assembly,
-                            typeof(RectangularPolygon).Assembly);
-                    var script = CSharpScript.Create<Type>(code, scriptOptions);
-                    var pipelineType = (await script.RunAsync(cancellationToken: cancellationToken)).ReturnValue;
-                    return (IPipeline) Activator.CreateInstance(pipelineType)!;
+                    return await engine.CompilePipelineAsync(code, cancellationToken);
                 }
                 catch (Exception e)
                 {
@@ -82,10 +89,10 @@ internal static class RenderExtensions
             })
             .WhereNotNull();
 
-    public static IObservable<IPipeline> CompilePipeline(this IObservable<string> pipelineFile, ILogger logger)
+    public static IObservable<IPipeline> CompilePipeline(this IObservable<string> pipelineFile, ILogger logger, Engine engine)
         => pipelineFile
             .GetPipelineCode()
-            .Compile(logger);
+            .Compile(logger, engine);
 
 
     private static IObservable<string> GetPipelineCode(this IObservable<string> pipelineFile)
@@ -93,32 +100,42 @@ internal static class RenderExtensions
         return pipelineFile
             .Select(file => WatchFile(file)
                 .SelectAsync((_, cancellationToken) => File.ReadAllTextAsync(file, cancellationToken))
-                .RetryWithBackOff((Exception _, int count) => TimeSpan.FromSeconds(Math.Min(count, 15))))
+                .RetryWithDefaultBackOff())
+            .Switch();
+    }
+
+    public static IObservable<string> ReadConfigurationContent(this IObservable<string> configurationFile, ILogger logger, IDeserializer deserializer)
+        => configurationFile
+            .Select(file => WatchFile(file)
+                .SelectAsync((_, cancellationToken) => File.ReadAllTextAsync(file, cancellationToken))
+                .RetryWithDefaultBackOff())
             .Switch();
 
-        IObservable<Unit> WatchFile(string file)
-            => Observable.Create<Unit>(observer =>
+    public static IObservable<T> RetryWithDefaultBackOff<T>(this IObservable<T> observable)
+        => observable.RetryWithBackOff((Exception _, int count) => TimeSpan.FromSeconds(Math.Min(count, 15)));
+
+    private static IObservable<Unit> WatchFile(string file)
+        => Observable.Create<Unit>(observer =>
+        {
+            observer.OnNext(Unit.Default);
+
+            var fullPath = Path.GetFullPath(file);
+            var directoryName = Path.GetDirectoryName(file)!;
+
+            var fileSystemWatcher = new FileSystemWatcher(directoryName);
+            fileSystemWatcher.EnableRaisingEvents = true;
+            var subscription = Observable.FromEventPattern<FileSystemEventArgs>(fileSystemWatcher, nameof(fileSystemWatcher.Changed))
+                .Select(o => o.EventArgs.FullPath)
+                .Where(o => Path.GetFullPath(o) == fullPath && File.Exists(fullPath))
+                .Select(_ => Unit.Default)
+                .Subscribe(observer);
+
+            return () =>
             {
-                observer.OnNext(Unit.Default);
-
-                var fullPath = Path.GetFullPath(file);
-                var directoryName = Path.GetDirectoryName(file)!;
-
-                var fileSystemWatcher = new FileSystemWatcher(directoryName);
-                fileSystemWatcher.EnableRaisingEvents = true;
-                var subscription = Observable.FromEventPattern<FileSystemEventArgs>(fileSystemWatcher, nameof(fileSystemWatcher.Changed))
-                    .Select(o => o.EventArgs.FullPath)
-                    .Where(o => Path.GetFullPath(o) == fullPath && File.Exists(fullPath))
-                    .Select(_ => Unit.Default)
-                    .Subscribe(observer);
-
-                return () =>
-                {
-                    subscription.Dispose();
-                    fileSystemWatcher.Dispose();
-                };
-            });
-    }
+                subscription.Dispose();
+                fileSystemWatcher.Dispose();
+            };
+        });
 }
 
 internal record PublishedImage(string Name, Image Image);
