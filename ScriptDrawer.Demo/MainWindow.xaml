@@ -10,5 +10,33 @@
     Height="450"
     d:DataContext="{d:DesignInstance local:MainViewModel}"
     mc:Ignorable="d">
-    <Grid />
+    <Window.Resources>
+        <local:ImageToImageSourceConverter x:Key="ImageToImageSourceConverter" />
+    </Window.Resources>
+    <Grid>
+        <ItemsControl ItemsSource="{Binding PublishedImages}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="Black" BorderThickness="2">
+                        <Grid MaxWidth="200pt" MaxHeight="200pt">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Image
+                                Grid.Row="0"
+                                Grid.RowSpan="2"
+                                Source="{Binding Image, Converter={StaticResource ImageToImageSourceConverter}}" />
+                            <Label Grid.Row="0" Content="{Binding Name}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
 </Window>
