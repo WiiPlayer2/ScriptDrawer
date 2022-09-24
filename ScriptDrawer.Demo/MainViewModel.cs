@@ -23,6 +23,27 @@ internal class MainViewModel
 
         configSubject
             .Select(config => config.Pipeline)
+            .Select(pipelineFile => Observable.Create<string>(observer =>
+            {
+                observer.OnNext(pipelineFile);
+
+                var fullPath = Path.GetFullPath(pipelineFile);
+                var directoryName = Path.GetDirectoryName(pipelineFile)!;
+
+                var fileSystemWatcher = new FileSystemWatcher(directoryName);
+                fileSystemWatcher.EnableRaisingEvents = true;
+                var subscription = Observable.FromEventPattern<FileSystemEventArgs>(fileSystemWatcher, nameof(fileSystemWatcher.Changed))
+                    .Select(o => o.EventArgs.FullPath)
+                    .Where(o => Path.GetFullPath(o) == fullPath)
+                    .Subscribe(observer);
+
+                return () =>
+                {
+                    subscription.Dispose();
+                    fileSystemWatcher.Dispose();
+                };
+            }).Retry())
+            .Switch()
             .Where(File.Exists)
             .SelectAsync(async pipelineFile =>
             {
@@ -43,6 +64,7 @@ internal class MainViewModel
                 }
             })
             .WhereNotNull()
+            .ObserveOnDispatcher()
             .Subscribe(async pipeline =>
             {
                 PublishedImages.Clear();
