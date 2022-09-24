@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Options;
@@ -49,17 +50,19 @@ internal class MainViewModel
             {
                 try
                 {
-                    await using var fileStream = File.OpenRead(pipelineFile);
+                    var code = await File.ReadAllTextAsync(pipelineFile);
                     var scriptOptions = ScriptOptions.Default
                         .WithFilePath(Path.GetFullPath(pipelineFile))
+                        .WithFileEncoding(Encoding.UTF8)
                         .WithReferences(typeof(IPipeline).Assembly)
                         .WithEmitDebugInformation(true);
-                    var script = CSharpScript.Create<Type>(fileStream, scriptOptions);
+                    var script = CSharpScript.Create<Type>(code, scriptOptions);
                     var pipelineType = (await script.RunAsync()).ReturnValue;
                     return (IPipeline) Activator.CreateInstance(pipelineType)!;
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine(e);
                     return null;
                 }
             })
@@ -68,7 +71,14 @@ internal class MainViewModel
             .Subscribe(async pipeline =>
             {
                 PublishedImages.Clear();
-                await pipeline.ExecuteAsync(publisher);
+                try
+                {
+                    await pipeline.ExecuteAsync(publisher);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             });
 
         configMonitor.OnChange(configSubject.OnNext);

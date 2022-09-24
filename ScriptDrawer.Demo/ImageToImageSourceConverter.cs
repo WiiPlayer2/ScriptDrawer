@@ -21,7 +21,8 @@ internal class ImageToImageSourceConverter : IValueConverter
         using var img = image.CloneAs<Bgra32>();
         var buffer = new byte[img.Width * img.Height * 4];
         img.CopyPixelDataTo(buffer);
-        var bmp = new WriteableBitmap(image.Width, image.Height, image.Metadata.HorizontalResolution, image.Metadata.VerticalResolution, PixelFormats.Bgra32, default);
+        var pixelFormat = Map(img);
+        var bmp = new WriteableBitmap(image.Width, image.Height, image.Metadata.HorizontalResolution, image.Metadata.VerticalResolution, pixelFormat, default);
         bmp.Lock();
         for (var x = 0; x < img.Width; x++)
         for (var y = 0; y < img.Height; y++)
@@ -46,4 +47,13 @@ internal class ImageToImageSourceConverter : IValueConverter
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+
+    private PixelFormat Map(Image image)
+    {
+        var imageType = image.GetType();
+        var pixelType = imageType.GenericTypeArguments[0];
+        if (pixelType == typeof(Bgra32))
+            return PixelFormats.Bgra32;
+        throw new NotImplementedException();
+    }
 }
