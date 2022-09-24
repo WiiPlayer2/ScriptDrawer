@@ -2,7 +2,7 @@
     x:Class="ScriptDrawer.Demo.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:ScriptDrawer.Demo"
-    StartupUri="MainWindow.xaml">
+    Exit="App_OnExit"
+    Startup="App_OnStartup">
     <Application.Resources />
 </Application>

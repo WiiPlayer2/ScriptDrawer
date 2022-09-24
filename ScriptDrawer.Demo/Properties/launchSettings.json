@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ScriptDrawer.Demo": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
