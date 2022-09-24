@@ -24,23 +24,7 @@ internal class ImageToImageSourceConverter : IValueConverter
         var pixelFormat = Map(img);
         var bmp = new WriteableBitmap(image.Width, image.Height, image.Metadata.HorizontalResolution, image.Metadata.VerticalResolution, pixelFormat, default);
         bmp.Lock();
-        for (var x = 0; x < img.Width; x++)
-        for (var y = 0; y < img.Height; y++)
-        {
-            var offset = (y * img.Width + x) * 4;
-
-            var backbuffer = bmp.BackBuffer;
-            backbuffer += offset;
-
-            var r = buffer[offset];
-            var g = buffer[offset + 1];
-            var b = buffer[offset + 2];
-            var a = buffer[offset + 3];
-            var color = (a << 24) | (r << 16) | (g << 8) | b;
-
-            Marshal.WriteInt32(backbuffer, color);
-        }
-
+        Marshal.Copy(buffer, 0, bmp.BackBuffer, buffer.Length);
         bmp.AddDirtyRect(new Int32Rect(0, 0, img.Width, img.Height));
         bmp.Unlock();
         return bmp;
