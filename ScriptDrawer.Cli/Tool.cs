@@ -24,12 +24,12 @@ internal class Tool
         return configuration;
     }
 
-    public async Task Run(FileInfo pipelineFile, FileInfo? configFile, DirectoryInfo outputDirectory)
+    public async Task Run(Input input)
     {
-        var pipelineCode = await File.ReadAllTextAsync(pipelineFile.FullName);
+        var pipelineCode = await File.ReadAllTextAsync(input.PipelineFile.FullName);
         var pipeline = await engine.CompilePipelineAsync(pipelineCode, CancellationToken.None);
-        var configuration = await ParseConfiguration(configFile, pipeline.ConfigurationType);
-        var publisher = new DelegatePublisher((name, image, cancellationToken) => SaveImage(outputDirectory, name, image, cancellationToken));
+        var configuration = await ParseConfiguration(input.ConfigFile, pipeline.ConfigurationType);
+        var publisher = new DelegatePublisher((name, image, cancellationToken) => SaveImage(input.OutputDirectory, name, image, cancellationToken));
         await pipeline.ExecuteAsync(publisher, configuration, CancellationToken.None);
     }
 

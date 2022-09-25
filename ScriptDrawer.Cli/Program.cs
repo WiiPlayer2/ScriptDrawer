@@ -11,44 +11,36 @@ return await BuildCommandLine()
     .UseHost(
         _ => Host.CreateDefaultBuilder(),
         host => host
-            .ConfigureServices(ConfigureServices))
+            .ConfigureServices(services =>
+            {
+                services.AddScriptDrawer();
+                services.AddSingleton<Tool>();
+            }))
     .UseDefaults()
     .Build()
     .InvokeAsync(args);
 
-void ConfigureServices(IServiceCollection services)
-{
-    services.AddScriptDrawer();
-    services.AddSingleton<Tool>();
-}
-
 CommandLineBuilder BuildCommandLine()
 {
-    var pipelineFileOption = new Option<FileInfo>(
-        "--pipeline-file",
-        "The pipeline file to use.")
-    {
-        IsRequired = true,
-    };
-
-    var configFileOption = new Option<FileInfo?>(
-        "--config-file",
-        "The configuration file to use.");
-
-    var outputDirectoryOption = new Option<DirectoryInfo>(
-        "--output-directory",
-        () => new DirectoryInfo(Environment.CurrentDirectory),
-        "The directory in which all published images are put.");
-
     var rootCommand = new RootCommand("CLI tool to execute ScriptDrawer pipelines.")
     {
-        pipelineFileOption,
-        configFileOption,
-        outputDirectoryOption,
+        new Option<FileInfo>(
+            "--pipeline-file",
+            "The pipeline file to use.")
+        {
+            IsRequired = true,
+        },
+        new Option<FileInfo?>(
+            "--config-file",
+            "The configuration file to use."),
+        new Option<DirectoryInfo>(
+            "--output-directory",
+            () => new DirectoryInfo(Environment.CurrentDirectory),
+            "The directory in which all published images are put."),
     };
 
     rootCommand.Handler = CommandHandler.Create<Input, IHost>(
-        (input, host) => host.Services.GetRequiredService<Tool>().Run(input.PipelineFile, input.ConfigFile, input.OutputDirectory));
+        (input, host) => host.Services.GetRequiredService<Tool>().Run(input));
 
     return new CommandLineBuilder(rootCommand);
 }
