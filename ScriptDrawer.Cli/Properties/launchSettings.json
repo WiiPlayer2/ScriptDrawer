@@ -3,7 +3,7 @@
     "ScriptDrawer.Cli": {
       "commandName": "Project",
       "commandLineArgs":
-        "--pipeline-file ../../../../ScriptDrawer.Demo/bin/Debug/net6.0-windows/pipelines/testing.pipeline.csx"
+        "--pipeline-file ../../../../ScriptDrawer.Demo/bin/Debug/net6.0-windows/pipelines/testing.pipeline.csx --config-file ../../../../ScriptDrawer.Demo/bin/Debug/net6.0-windows/configuration/testing.config.yaml --output-directory ./output"
     }
   }
 }
