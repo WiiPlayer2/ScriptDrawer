@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptDrawer.Core", "ScriptDrawer.Core\ScriptDrawer.Core.csproj", "{40F4A16F-80A0-40C3-A50C-2BEFB62F048C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.Core", "ScriptDrawer.Core\ScriptDrawer.Core.csproj", "{40F4A16F-80A0-40C3-A50C-2BEFB62F048C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptDrawer.Demo", "ScriptDrawer.Demo\ScriptDrawer.Demo.csproj", "{CF70982B-C41D-48CF-AF1C-F2F4CF9F00B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.Demo", "ScriptDrawer.Demo\ScriptDrawer.Demo.csproj", "{CF70982B-C41D-48CF-AF1C-F2F4CF9F00B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptDrawer.Shared", "ScriptDrawer.Shared\ScriptDrawer.Shared.csproj", "{8F3B212B-0E54-4905-9519-B99E39E61039}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.Shared", "ScriptDrawer.Shared\ScriptDrawer.Shared.csproj", "{8F3B212B-0E54-4905-9519-B99E39E61039}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptDrawer.Cli", "ScriptDrawer.Cli\ScriptDrawer.Cli.csproj", "{ED3A7186-D3D5-4103-8259-ED26D53C7775}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{8F3B212B-0E54-4905-9519-B99E39E61039}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F3B212B-0E54-4905-9519-B99E39E61039}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F3B212B-0E54-4905-9519-B99E39E61039}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED3A7186-D3D5-4103-8259-ED26D53C7775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED3A7186-D3D5-4103-8259-ED26D53C7775}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED3A7186-D3D5-4103-8259-ED26D53C7775}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED3A7186-D3D5-4103-8259-ED26D53C7775}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
