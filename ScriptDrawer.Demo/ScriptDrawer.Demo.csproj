@@ -17,6 +17,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ScriptDrawer.Core\ScriptDrawer.Core.csproj" />
+		<ProjectReference Include="..\ScriptDrawer.DependencyInjection\ScriptDrawer.DependencyInjection.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

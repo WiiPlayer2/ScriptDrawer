@@ -11,9 +11,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
 using ScriptDrawer.Core;
+using ScriptDrawer.Serialization;
 using ScriptDrawer.Shared;
 using SixLabors.ImageSharp;
-using YamlDotNet.Serialization;
 
 namespace ScriptDrawer.Demo;
 
@@ -24,7 +24,7 @@ internal class MainViewModel
     public MainViewModel(
         IOptionsMonitor<Config> configMonitor,
         ILogger<MainViewModel> logger,
-        IDeserializer deserializer,
+        ConfigSerializer configSerializer,
         Engine engine)
     {
         var publisher = new DelegatePublisher((name, image) => PublishedImages.Add(new PublishedImage(name, image)));
@@ -35,11 +35,11 @@ internal class MainViewModel
 
         var configurationContent = configSubject
             .Select(config => config.Configuration)
-            .ReadConfigurationContent(logger, deserializer);
+            .ReadConfigurationContent(logger, configSerializer);
 
         pipelines.CombineLatest(configurationContent, (pipeline, configurationContent) =>
             {
-                var configuration = deserializer.Deserialize(configurationContent, pipeline.ConfigurationType);
+                var configuration = configSerializer.Deserialize(configurationContent, pipeline.ConfigurationType);
                 return (pipeline, configuration);
             })
             .RetryWithDefaultBackOff()
@@ -104,7 +104,7 @@ internal static class RenderExtensions
             .Switch();
     }
 
-    public static IObservable<string> ReadConfigurationContent(this IObservable<string> configurationFile, ILogger logger, IDeserializer deserializer)
+    public static IObservable<string> ReadConfigurationContent(this IObservable<string> configurationFile, ILogger logger, ConfigSerializer serializer)
         => configurationFile
             .Select(file => WatchFile(file)
                 .SelectAsync((_, cancellationToken) => File.ReadAllTextAsync(file, cancellationToken))
