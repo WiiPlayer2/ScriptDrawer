@@ -9,11 +9,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.Demo", "Script
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.Shared", "ScriptDrawer.Shared\ScriptDrawer.Shared.csproj", "{8F3B212B-0E54-4905-9519-B99E39E61039}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptDrawer.Cli", "ScriptDrawer.Cli\ScriptDrawer.Cli.csproj", "{ED3A7186-D3D5-4103-8259-ED26D53C7775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.Cli", "ScriptDrawer.Cli\ScriptDrawer.Cli.csproj", "{ED3A7186-D3D5-4103-8259-ED26D53C7775}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptDrawer.DependencyInjection", "ScriptDrawer.DependencyInjection\ScriptDrawer.DependencyInjection.csproj", "{D7D863F3-8F19-47AA-A787-86106A62226E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.DependencyInjection", "ScriptDrawer.DependencyInjection\ScriptDrawer.DependencyInjection.csproj", "{D7D863F3-8F19-47AA-A787-86106A62226E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptDrawer.Serialization", "ScriptDrawer.Serialization\ScriptDrawer.Serialization.csproj", "{FF857FBF-2CC8-4961-B43A-CF0314C75613}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptDrawer.Serialization", "ScriptDrawer.Serialization\ScriptDrawer.Serialization.csproj", "{FF857FBF-2CC8-4961-B43A-CF0314C75613}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{98D62783-61E6-4588-85EB-04EAF5994296}"
+	ProjectSection(SolutionItems) = preProject
+		Demo\demo.config.yaml = Demo\demo.config.yaml
+		Demo\demo.pipeline.csx = Demo\demo.pipeline.csx
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
