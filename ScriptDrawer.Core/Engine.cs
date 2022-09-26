@@ -19,4 +19,26 @@ public class Engine
             throw new InvalidOperationException("No pipeline type was returned.");
         return instantiate(pipelineType);
     }
+
+    public Task RunPipelineAsync(IPipeline pipeline, PipelineConfig? config, IPublisher publisher, CancellationToken cancellationToken)
+    {
+        return RunPipelineAsync(pipeline, config, CreatePublisher, cancellationToken);
+
+        IPublisher CreatePublisher(IReadOnlyList<int> indices, object? config)
+            => new DelegatePublisher((name, image, cancellationToken) => publisher.PublishAsync(MapName(indices, name), image, cancellationToken));
+
+        string MapName(IReadOnlyList<int> indices, string name)
+            => indices.Count == 0
+                ? name
+                : $"{string.Join("-", indices)}_{name}";
+    }
+
+    public async Task RunPipelineAsync(IPipeline pipeline, PipelineConfig? config, Func<IReadOnlyList<int>, object?, IPublisher> createPublisher, CancellationToken cancellationToken)
+    {
+        if (config is null)
+            await pipeline.ExecuteAsync(createPublisher(Array.Empty<int>(), default), default, cancellationToken);
+        else
+            foreach (var (indices, configuration) in config.BuildConfigs())
+                await pipeline.ExecuteAsync(createPublisher(indices, configuration), configuration, cancellationToken);
+    }
 }

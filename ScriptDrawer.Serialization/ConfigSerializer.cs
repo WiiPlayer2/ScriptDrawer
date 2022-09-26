@@ -1,4 +1,5 @@
-﻿using ScriptDrawer.Core;
+﻿using System.Diagnostics.CodeAnalysis;
+using ScriptDrawer.Core;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -7,21 +8,9 @@ namespace ScriptDrawer.Serialization;
 
 public class ConfigSerializer
 {
-    private readonly IDeserializer deserializer;
-
-    public ConfigSerializer()
-    {
-        deserializer = CreateBuilder().Build();
-    }
-
     private static DeserializerBuilder CreateBuilder() => new();
 
-    public object? Deserialize(string? content, Type configurationType)
-        => content is null
-            ? null
-            : deserializer.Deserialize(content, configurationType);
-
-    public PipelineConfig? Deserialize2(string? content, Type configurationType)
+    public PipelineConfig? Deserialize(string? content, Type configurationType)
     {
         if (content is null) return null;
 
@@ -29,8 +18,11 @@ public class ConfigSerializer
             .WithNodeDeserializer(new PipelineConfigDeserializer(configurationType))
             .Build();
 
-        var config = deserializer.Deserialize<PCR>(content);
-        var matrix = config.Matrix.Values.ToDictionary(o => o.Key, o => (IReadOnlyList<object?>) o.Value);
+        var config = deserializer.Deserialize<PCR?>(content);
+        if (config is null) return null;
+
+        var matrix = config.Matrix.Values
+            .ToDictionary(o => o.Key, o => (IReadOnlyList<object?>) o.Value);
         var configuration = config.Configuration.Object;
         return new PipelineConfig(
             configurationType,
@@ -38,11 +30,12 @@ public class ConfigSerializer
             configuration);
     }
 
+    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local")]
     private class PCR
     {
-        public Config_ Configuration { get; } = default!;
+        public Config_ Configuration { get; init; } = default!;
 
-        public Matrix_ Matrix { get; } = new(new Dictionary<string, List<object?>>());
+        public Matrix_ Matrix { get; init; } = new(new Dictionary<string, List<object?>>());
 
         public class Config_
         {

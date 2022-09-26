@@ -47,7 +47,7 @@ internal class MainViewModel
             .SelectAsync(async (pair, cancellationToken) =>
             {
                 var (pipeline, configuration) = pair;
-                await ExecutePipelineAsync(pipeline, logger, publisher, configuration, cancellationToken);
+                await ExecutePipelineAsync(engine, pipeline, logger, publisher, configuration, cancellationToken);
                 return Unit.Default;
             })
             .Subscribe();
@@ -58,12 +58,12 @@ internal class MainViewModel
 
     public ObservableCollection<PublishedImage> PublishedImages { get; } = new();
 
-    private async Task ExecutePipelineAsync(IPipeline pipeline, ILogger logger, IPublisher publisher, object? configuration, CancellationToken cancellationToken)
+    private async Task ExecutePipelineAsync(Engine engine, IPipeline pipeline, ILogger logger, IPublisher publisher, PipelineConfig? configuration, CancellationToken cancellationToken)
     {
         PublishedImages.Clear();
         try
         {
-            await pipeline.ExecuteAsync(publisher, configuration, cancellationToken);
+            await engine.RunPipelineAsync(pipeline, configuration, publisher, cancellationToken);
         }
         catch (Exception e)
         {
