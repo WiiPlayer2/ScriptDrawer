@@ -1,9 +1,9 @@
 Matrix:
-  AvatarFile:
-    - C:\Users\waldemar\Dropbox\Bilder\Fertiges\Avatars\cosplay2018.jpg
-    - C:\Users\waldemar\Dropbox\Bilder\Fertiges\Avatars\DarkLink.png
-  FlagFile:
-    - C:\Users\waldemar\Dropbox\Bilder\Materialien\PrideProgress.png
+  AvatarRef:
+    - !imageFile C:\Users\waldemar\Dropbox\Bilder\Fertiges\Avatars\cosplay2018.jpg
+    - !imageFile C:\Users\waldemar\Dropbox\Bilder\Fertiges\Avatars\DarkLink.png
+  FlagRef:
+    - !imageFile C:\Users\waldemar\Dropbox\Bilder\Materialien\PrideProgress.png
 Configuration:
   Radius: 0.9
   CirclePoints: 50

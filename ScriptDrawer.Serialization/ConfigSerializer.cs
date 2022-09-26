@@ -8,7 +8,9 @@ namespace ScriptDrawer.Serialization;
 
 public class ConfigSerializer
 {
-    private static DeserializerBuilder CreateBuilder() => new();
+    private static DeserializerBuilder CreateBuilder() => new DeserializerBuilder()
+        .WithTagMapping("!imageFile", typeof(ImageFileRef))
+        .WithNodeDeserializer(new ImageFileRefDeserializer());
 
     public PipelineConfig? Deserialize(string? content, Type configurationType)
     {
