@@ -19,3 +19,11 @@ internal abstract class NodeDeserializer<T> : INodeDeserializer
 
     protected abstract T Deserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer);
 }
+
+internal abstract class NodeDeserializer<T, TIntermediate> : NodeDeserializer<T>
+{
+    protected sealed override T Deserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer)
+        => Deserialize((TIntermediate) nestedObjectDeserializer(reader, typeof(TIntermediate))!);
+
+    protected abstract T Deserialize(TIntermediate intermediateValue);
+}
