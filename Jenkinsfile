@@ -22,7 +22,7 @@ pipeline {
 
         stage('Pack') {
             steps {
-                sh 'dotnet pack --no-build ./ScriptDrawer.Cli --output ./packages'
+                sh 'dotnet pack --no-build ./ScriptDrawer.Cli --output ./packages --version-suffix $(date +%s)'
             }
         }
 
