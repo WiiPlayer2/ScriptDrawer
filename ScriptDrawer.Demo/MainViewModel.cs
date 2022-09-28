@@ -101,7 +101,8 @@ internal static class RenderExtensions
             .Select(file => WatchFile(file)
                 .SelectAsync((_, cancellationToken) => File.ReadAllTextAsync(file, cancellationToken))
                 .RetryWithDefaultBackOff())
-            .Switch();
+            .Switch()
+            .DistinctUntilChanged();
     }
 
     public static IObservable<string> ReadConfigurationContent(this IObservable<string> configurationFile, ILogger logger, ConfigSerializer serializer)
@@ -109,7 +110,8 @@ internal static class RenderExtensions
             .Select(file => WatchFile(file)
                 .SelectAsync((_, cancellationToken) => File.ReadAllTextAsync(file, cancellationToken))
                 .RetryWithDefaultBackOff())
-            .Switch();
+            .Switch()
+            .DistinctUntilChanged();
 
     public static IObservable<T> RetryWithDefaultBackOff<T>(this IObservable<T> observable)
         => observable.RetryWithBackOff((Exception _, int count) => TimeSpan.FromSeconds(Math.Min(count, 15)));

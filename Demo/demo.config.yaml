@@ -4,6 +4,7 @@ Matrix:
     - !imageFile C:\Users\waldemar\Dropbox\Bilder\Fertiges\Avatars\DarkLink.png
   FlagRef:
     - !imageFile C:\Users\waldemar\Dropbox\Bilder\Materialien\PrideProgress.png
+    - !imageUrl https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Nonbinary_flag.svg/1200px-Nonbinary_flag.svg.png
 Configuration:
   Radius: 0.9
   CirclePoints: 50

@@ -1,4 +1,5 @@
 ﻿using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 
 namespace ScriptDrawer.Serialization;
@@ -23,7 +24,44 @@ internal abstract class NodeDeserializer<T> : INodeDeserializer
 internal abstract class NodeDeserializer<T, TIntermediate> : NodeDeserializer<T>
 {
     protected sealed override T Deserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer)
-        => Deserialize((TIntermediate) nestedObjectDeserializer(reader, typeof(TIntermediate))!);
+    {
+        var proxyParser = new ProxyParser(reader);
+        return Deserialize((TIntermediate) nestedObjectDeserializer(proxyParser, typeof(TIntermediate))!);
+    }
 
     protected abstract T Deserialize(TIntermediate intermediateValue);
+
+    private class ProxyParser : IParser
+    {
+        private readonly IParser baseReader;
+
+        public ProxyParser(IParser baseReader)
+        {
+            this.baseReader = baseReader;
+            Current = WithoutTag(baseReader.Current);
+        }
+
+        public ParsingEvent? Current { get; private set; }
+
+        public bool MoveNext()
+        {
+            if (!baseReader.MoveNext())
+                return false;
+
+            Current = baseReader.Current;
+            return true;
+        }
+
+        private ParsingEvent? WithoutTag(ParsingEvent? @event)
+        {
+            if (@event is null or not NodeEvent)
+                return @event;
+
+            return @event switch
+            {
+                Scalar scalar => new Scalar(scalar.Anchor, default, scalar.Value, scalar.Style, scalar.IsPlainImplicit, scalar.IsQuotedImplicit),
+                _ => throw new NotImplementedException(),
+            };
+        }
+    }
 }

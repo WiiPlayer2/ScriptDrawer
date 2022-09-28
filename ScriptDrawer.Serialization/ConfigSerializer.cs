@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ScriptDrawer.Core;
+using ScriptDrawer.Core.Refs;
+using ScriptDrawer.Serialization.Deserializers;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -9,8 +11,8 @@ namespace ScriptDrawer.Serialization;
 public class ConfigSerializer
 {
     private static DeserializerBuilder CreateBuilder() => new DeserializerBuilder()
-        .WithTagMapping("!imageFile", typeof(ImageFileRef))
-        .WithNodeDeserializer(new ImageFileRefDeserializer());
+        .WithTaggedDeserializer<ImageFileRef, ImageFileRefDeserializer>("!imageFile")
+        .WithTaggedDeserializer<ImageUrlRef, ImageUrlRefDeserializer>("!imageUrl");
 
     public PipelineConfig? Deserialize(string? content, Type configurationType)
     {
