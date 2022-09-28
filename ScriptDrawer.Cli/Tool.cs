@@ -39,7 +39,11 @@ internal class Tool
         var configuration = await ParseConfiguration(input.ConfigFile, pipeline.ConfigurationType);
 
         logger.LogInformation("Executing pipeline...");
-        var publisher = new DelegatePublisher((name, image, cancellationToken) => SaveImage(input.OutputDirectory, name, image, cancellationToken));
+        var publisher = new DelegatePublisher(async (name, image, cancellationToken) =>
+        {
+            if (input.Publish.Count == 0 || input.Publish.Any(name.EndsWith))
+                await SaveImage(input.OutputDirectory, name, image, cancellationToken);
+        });
         await engine.RunPipelineAsync(pipeline, configuration, publisher, CancellationToken.None);
     }
 

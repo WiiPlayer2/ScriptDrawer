@@ -2,7 +2,8 @@
   "profiles": {
     "ScriptDrawer.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "--pipeline-file ../../../../Demo/demo.pipeline.csx --config-file ../../../../Demo/demo.config.yaml --output-directory ./output"
+      "commandLineArgs":
+        "--pipeline-file ../../../../Demo/demo.pipeline.csx --config-file ../../../../Demo/demo.config.yaml --output-directory ./output --publish result"
     }
   }
 }

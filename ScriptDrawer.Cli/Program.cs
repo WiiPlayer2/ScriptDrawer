@@ -37,6 +37,9 @@ CommandLineBuilder BuildCommandLine()
             "--output-directory",
             () => new DirectoryInfo(Environment.CurrentDirectory),
             "The directory in which all published images are put."),
+        new Option<IEnumerable<string>>(
+            "--publish",
+            "Publish only images with this name."),
     };
 
     rootCommand.Handler = CommandHandler.Create<Input, IHost>(
@@ -45,4 +48,4 @@ CommandLineBuilder BuildCommandLine()
     return new CommandLineBuilder(rootCommand);
 }
 
-internal record Input(FileInfo PipelineFile, FileInfo? ConfigFile, DirectoryInfo OutputDirectory);
+internal record Input(FileInfo PipelineFile, FileInfo? ConfigFile, DirectoryInfo OutputDirectory, IReadOnlyList<string> Publish);
