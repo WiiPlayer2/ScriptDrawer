@@ -1,6 +1,6 @@
-﻿using ScriptDrawer.Core;
+﻿using ScriptDrawer.Core.Refs;
 
-namespace ScriptDrawer.Serialization;
+namespace ScriptDrawer.Serialization.Deserializers;
 
 internal class ImageFileRefDeserializer : NodeDeserializer<ImageFileRef, string>
 {

@@ -1,7 +1,7 @@
 ﻿using ScriptDrawer.Shared;
 using SixLabors.ImageSharp;
 
-namespace ScriptDrawer.Core;
+namespace ScriptDrawer.Core.Refs;
 
 public class ImageFileRef : IRef<Image>
 {

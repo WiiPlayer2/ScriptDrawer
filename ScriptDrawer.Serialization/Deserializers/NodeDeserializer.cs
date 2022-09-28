@@ -2,7 +2,7 @@
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 
-namespace ScriptDrawer.Serialization;
+namespace ScriptDrawer.Serialization.Deserializers;
 
 internal abstract class NodeDeserializer<T> : INodeDeserializer
 {
