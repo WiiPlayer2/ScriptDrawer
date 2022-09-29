@@ -18,6 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{98D62783-61E6-4588-85EB-04EAF5994296}"
 	ProjectSection(SolutionItems) = preProject
 		Demo\demo.config.yaml = Demo\demo.config.yaml
+		Demo\blank.pipeline.csx = Demo\blank.pipeline.csx
 		Demo\demo.pipeline.csx = Demo\demo.pipeline.csx
 	EndProjectSection
 EndProject

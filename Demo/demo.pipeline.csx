@@ -1,6 +1,6 @@
-#r "../ScriptDrawer.Shared.dll"
-#r "../SixLabors.ImageSharp.dll"
-#r "../SixLabors.ImageSharp.Drawing.dll"
+#r "nuget: ScriptDrawer.Shared, 0.1.0-1664441847"
+#r "nuget: SixLabors.ImageSharp, 2.1.3"
+#r "nuget: SixLabors.ImageSharp.Drawing, 1.0.0-beta15"
 #nullable enable
 
 using System;
