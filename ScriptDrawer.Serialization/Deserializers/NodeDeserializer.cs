@@ -26,10 +26,10 @@ internal abstract class NodeDeserializer<T, TIntermediate> : NodeDeserializer<T>
     protected sealed override T Deserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer)
     {
         var proxyParser = new ProxyParser(reader);
-        return Deserialize((TIntermediate) nestedObjectDeserializer(proxyParser, typeof(TIntermediate))!);
+        return Deserialize((TIntermediate) nestedObjectDeserializer(proxyParser, typeof(TIntermediate))!, nestedObjectDeserializer);
     }
 
-    protected abstract T Deserialize(TIntermediate intermediateValue);
+    protected abstract T Deserialize(TIntermediate intermediateValue, Func<IParser, Type, object?> nestedObjectDeserializer);
 
     private class ProxyParser : IParser
     {

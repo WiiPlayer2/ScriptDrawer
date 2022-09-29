@@ -15,7 +15,11 @@ using System.Threading;
 
 public class Config
 {
+    public byte Red { get; init; }
 
+    public byte Green { get; init; }
+
+    public byte Blue { get; init; }
 }
 
 public class Blank : IPipeline<Config>
@@ -23,7 +27,8 @@ public class Blank : IPipeline<Config>
     async Task IPipeline<Config>.ExecuteAsync(IPublisher publisher, Config configuration, CancellationToken cancellationToken)
     {
         using var image = new Image<Bgra32>(800, 600);
-        image.Mutate(x => x.Fill(Color.Green));
+        var color = Color.FromRgb(configuration.Red, configuration.Green, configuration.Blue);
+        image.Mutate(x => x.Fill(color));
         await publisher.PublishAsync("result", image, cancellationToken);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using ScriptDrawer.Core;
 using ScriptDrawer.Core.Refs;
 using ScriptDrawer.Shared;
+using YamlDotNet.Core;
+using YamlDotNet.RepresentationModel;
 
 namespace ScriptDrawer.Serialization.Deserializers;
 
@@ -13,11 +15,12 @@ internal class ImagePipelineRefDeserializer : NodeDeserializer<ImagePipelineRef,
         this.engine = engine;
     }
 
-    protected override ImagePipelineRef Deserialize(Config intermediateValue) => new(Ref.To(async cancellationToken =>
+    protected override ImagePipelineRef Deserialize(Config intermediateValue, Func<IParser, Type, object?> nestedObjectDeserializer) => new(Ref.To(async cancellationToken =>
     {
         var code = await intermediateValue.Instance.Pipeline.ResolveAsync(cancellationToken);
         var pipeline = await engine.CompilePipelineAsync(code, cancellationToken) ?? throw new InvalidOperationException();
-        return new PipelineInstance(pipeline, default);
+        var config = nestedObjectDeserializer(intermediateValue.Instance.Configuration.Parse(), pipeline.ConfigurationType);
+        return new PipelineInstance(pipeline, config);
     }), intermediateValue.Publish);
 
     public class Config
@@ -28,7 +31,7 @@ internal class ImagePipelineRefDeserializer : NodeDeserializer<ImagePipelineRef,
 
         public class PipelineInstanceRaw
         {
-            public object? Configuration { get; init; }
+            public YamlMappingNode Configuration { get; init; } = default!;
 
             public IRef<string> Pipeline { get; init; } = default!;
         }
