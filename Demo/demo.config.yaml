@@ -7,7 +7,7 @@ Matrix:
     #- !imageUrl https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Nonbinary_flag.svg/1200px-Nonbinary_flag.svg.png
     - !imagePipeline
       Instance:
-        Pipeline: !textFile ../../../../blank.pipeline.csx
+        Pipeline: !textFile ../../../../Demo/blank.pipeline.csx
         Configuration:
             Red: 255
             Green: 128
