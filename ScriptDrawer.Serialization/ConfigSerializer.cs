@@ -10,9 +10,18 @@ namespace ScriptDrawer.Serialization;
 
 public class ConfigSerializer
 {
-    private static DeserializerBuilder CreateBuilder() => new DeserializerBuilder()
+    private readonly Engine engine;
+
+    public ConfigSerializer(Engine engine)
+    {
+        this.engine = engine;
+    }
+
+    private DeserializerBuilder CreateBuilder() => new DeserializerBuilder()
         .WithTaggedDeserializer<ImageFileRef, ImageFileRefDeserializer>("!imageFile")
-        .WithTaggedDeserializer<ImageUrlRef, ImageUrlRefDeserializer>("!imageUrl");
+        .WithTaggedDeserializer<ImageUrlRef, ImageUrlRefDeserializer>("!imageUrl")
+        .WithTagMapping("!imagePipeline", typeof(ImagePipelineRef)).WithNodeDeserializer(new ImagePipelineRefDeserializer(engine))
+        .WithTaggedDeserializer<StringFileRef, StringFileRefDeserializer>("!textFile");
 
     public PipelineConfig? Deserialize(string? content, Type configurationType)
     {

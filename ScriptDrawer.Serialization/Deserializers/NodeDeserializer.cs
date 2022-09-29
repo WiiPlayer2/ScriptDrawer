@@ -60,6 +60,7 @@ internal abstract class NodeDeserializer<T, TIntermediate> : NodeDeserializer<T>
             return @event switch
             {
                 Scalar scalar => new Scalar(scalar.Anchor, default, scalar.Value, scalar.Style, scalar.IsPlainImplicit, scalar.IsQuotedImplicit),
+                MappingStart mappingStart => new MappingStart(mappingStart.Anchor, default, mappingStart.IsImplicit, mappingStart.Style),
                 _ => throw new NotImplementedException(),
             };
         }
