@@ -17,12 +17,14 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'dotnet build ./ScriptDrawer.Cli'
+                sh 'dotnet build ./ScriptDrawer.Shared'
             }
         }
 
         stage('Pack') {
             steps {
                 sh 'dotnet pack --no-build ./ScriptDrawer.Cli --output ./packages --version-suffix $(date +%s)'
+                sh 'dotnet pack --no-build ./ScriptDrawer.Shared --output ./packages --version-suffix $(date +%s)'
             }
         }
 
