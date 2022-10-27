@@ -1,15 +1,10 @@
-﻿using ScriptDrawer.Shared;
+﻿using System;
+using ScriptDrawer.Core.Refs.Mappers;
 
 namespace ScriptDrawer.Core.Refs;
 
-public class StringFileRef : IRef<string>
+[Obsolete]
+public class StringFileRef : FileRef<string, StreamToStringMapper>
 {
-    public StringFileRef(string filePath)
-    {
-        FilePath = filePath;
-    }
-
-    public string FilePath { get; }
-
-    public Task<string> ResolveAsync(CancellationToken cancellationToken) => File.ReadAllTextAsync(FilePath, cancellationToken);
+    public StringFileRef(string filePath) : base(filePath) { }
 }

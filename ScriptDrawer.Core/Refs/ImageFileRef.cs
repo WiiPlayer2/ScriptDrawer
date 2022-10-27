@@ -1,16 +1,11 @@
-﻿using ScriptDrawer.Shared;
+﻿using System;
+using ScriptDrawer.Core.Refs.Mappers;
 using SixLabors.ImageSharp;
 
 namespace ScriptDrawer.Core.Refs;
 
-public class ImageFileRef : IRef<Image>
+[Obsolete]
+public class ImageFileRef : FileRef<Image, StreamToImageMapper>
 {
-    public ImageFileRef(string filePath)
-    {
-        FilePath = filePath;
-    }
-
-    public string FilePath { get; }
-
-    public Task<Image> ResolveAsync(CancellationToken cancellationToken) => Image.LoadAsync(FilePath, cancellationToken);
+    public ImageFileRef(string filePath) : base(filePath) { }
 }
