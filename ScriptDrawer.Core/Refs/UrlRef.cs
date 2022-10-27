@@ -25,7 +25,7 @@ public class UrlRef<T, TMapper> : IRef<T>
             {
                 UserAgent =
                 {
-                    new ProductInfoHeaderValue("ScriptDrawer", typeof(ImageUrlRef).Assembly.GetName().Version?.ToString(2)),
+                    new ProductInfoHeaderValue("ScriptDrawer", typeof(UrlRef<,>).Assembly.GetName().Version?.ToString(2)),
                 },
             },
         };

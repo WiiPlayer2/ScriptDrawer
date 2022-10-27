@@ -1,7 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using ScriptDrawer.Core;
 using ScriptDrawer.Core.Refs;
+using ScriptDrawer.Core.Refs.Mappers;
 using ScriptDrawer.Serialization.Deserializers;
+using SixLabors.ImageSharp;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -18,10 +21,10 @@ public class ConfigSerializer
     }
 
     private DeserializerBuilder CreateBuilder() => new DeserializerBuilder()
-        .WithTaggedDeserializer<ImageFileRef, ImageFileRefDeserializer>("!imageFile")
-        .WithTaggedDeserializer<ImageUrlRef, ImageUrlRefDeserializer>("!imageUrl")
-        .WithTagMapping("!imagePipeline", typeof(ImagePipelineRef)).WithNodeDeserializer(new ImagePipelineRefDeserializer(engine))
-        .WithTaggedDeserializer<StringFileRef, StringFileRefDeserializer>("!textFile");
+        .WithTaggedDeserializer<Image, StreamToImageMapper>("!imageFile", typeof(FileRef<,>), typeof(FileRefDeserializer<,>))
+        .WithTaggedDeserializer<Image, StreamToImageMapper>("!imageUrl", typeof(UrlRef<,>), typeof(UrlRefDeserializer<,>))
+        .WithTaggedDeserializer<string, StreamToStringMapper>("!textFile", typeof(FileRef<,>), typeof(FileRefDeserializer<,>))
+        .WithTagMapping("!imagePipeline", typeof(ImagePipelineRef)).WithNodeDeserializer(new ImagePipelineRefDeserializer(engine));
 
     public PipelineConfig? Deserialize(string? content, Type configurationType)
     {
