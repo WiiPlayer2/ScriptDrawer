@@ -21,9 +21,13 @@ public class ConfigSerializer
     }
 
     private DeserializerBuilder CreateBuilder() => new DeserializerBuilder()
-        .WithTaggedDeserializer<Image, StreamToImageMapper>("!imageFile", typeof(FileRef<,>), typeof(FileRefDeserializer<,>))
-        .WithTaggedDeserializer<Image, StreamToImageMapper>("!imageUrl", typeof(UrlRef<,>), typeof(UrlRefDeserializer<,>))
-        .WithTaggedDeserializer<string, StreamToStringMapper>("!textFile", typeof(FileRef<,>), typeof(FileRefDeserializer<,>))
+        .WithTaggedDeserializerMatrix(matrix => matrix
+            .AddTargetType<Image>("image")
+            .AddTargetType<string>("text")
+            .AddRefType("File", typeof(FileRef<,>), typeof(FileRefDeserializer<,>))
+            .AddRefType("Url", typeof(UrlRef<,>), typeof(UrlRefDeserializer<,>))
+            .AddMapper<Stream, Image, StreamToImageMapper>()
+            .AddMapper<Stream, string, StreamToStringMapper>())
         .WithTagMapping("!imagePipeline", typeof(ImagePipelineRef)).WithNodeDeserializer(new ImagePipelineRefDeserializer(engine));
 
     public PipelineConfig? Deserialize(string? content, Type configurationType)
