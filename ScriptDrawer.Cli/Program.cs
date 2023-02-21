@@ -48,4 +48,4 @@ CommandLineBuilder BuildCommandLine()
     return new CommandLineBuilder(rootCommand);
 }
 
-internal record Input(FileInfo PipelineFile, FileInfo? ConfigFile, DirectoryInfo OutputDirectory, IReadOnlyList<string> Publish);
+internal record Input(FileInfo PipelineFile, FileInfo? ConfigFile, DirectoryInfo OutputDirectory, List<string> Publish);
