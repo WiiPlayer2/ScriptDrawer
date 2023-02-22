@@ -2,6 +2,7 @@
 using ScriptDrawer.Core;
 using ScriptDrawer.Serialization;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace ScriptDrawer.Cli;
 
@@ -53,6 +54,6 @@ internal class Tool
         var targetPath = Path.Combine(outputDirectory.FullName, $"{name}.png");
 
         logger.LogInformation("Exporting {name} to {path}...", name, targetPath);
-        await image.SaveAsPngAsync(targetPath, cancellationToken);
+        await image.SaveAsPngAsync(targetPath, new PngEncoder() {ColorType = PngColorType.RgbWithAlpha}, cancellationToken);
     }
 }
