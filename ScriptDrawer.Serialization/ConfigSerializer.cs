@@ -43,7 +43,7 @@ public class ConfigSerializer
 
         var matrix = config.Matrix.Values
             .ToDictionary(o => o.Key, o => (IReadOnlyList<object?>) o.Value);
-        var configuration = config.Configuration.Object;
+        var configuration = config.Configuration?.Object ?? throw new InvalidOperationException("Configuration must not be empty.");
         return new PipelineConfig(
             configurationType,
             matrix,
